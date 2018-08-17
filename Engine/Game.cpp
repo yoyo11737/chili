@@ -38,7 +38,27 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	//wnd.kbd.KeyIsPressed(VK_LEFT)
+	//wnd.kbd.KeyIsPressed(VK_RIGHT)
+	//wnd.kbd.KeyIsPressed(VK_UP)
+	//wnd.kbd.KeyIsPressed(VK_DOWN)
 	if (wnd.kbd.KeyIsPressed(VK_LEFT)) {
+		movx -= 1;
+	}
+	if (wnd.kbd.KeyIsPressed(VK_RIGHT)) {
+		movx += 1;
+	}
+	if (wnd.kbd.KeyIsPressed(VK_UP)) {
+		movy -= 1;
+	}
+	if (wnd.kbd.KeyIsPressed(VK_DOWN)) {
+		movy += 1;
+	}
+
+	colliding = OverLapTest(movx, movy);
+
+	//******************Velocity Movement*******************
+	/*if (wnd.kbd.KeyIsPressed(VK_LEFT)) {
 		if (slowLeft) {
 
 		}
@@ -85,26 +105,32 @@ void Game::UpdateModel()
 
 	x += vx;
 	y += vy;
+	*/
+	//Border Collision = Make a function for this
+	
+	/*if (movx + 4 >= gfx.ScreenWidth) {
+		movx = gfx.ScreenWidth - 5;
+		//vx = 0;
+	}
+	if (movx - 4 < 0) {
+		movx = 4;
+		//vx = 0;
+	}
+	if (movy + 4 >= gfx.ScreenHeight) {
+		movy = gfx.ScreenHeight - 5;
+		//vy = 0;
+	}
+	if (movy - 4 < 0) {
+		movy = 4;
+		//vy = 0;
+	}
+	*/
 
-	//Border Collision
-	if (x + 4 >= gfx.ScreenWidth) {
-		x = gfx.ScreenWidth - 5;
-		vx = 0;
-	}
-	if (x - 4 < 0) {
-		x = 4;
-		vx = 0;
-	}
-	if (y + 4 >= gfx.ScreenHeight) {
-		y = gfx.ScreenHeight - 5;
-		vy = 0;
-	}
-	if (y - 4 < 0) {
-		y = 4;
-		vy = 0;
-	}
+	movx = xborder(movx);
+	movy = yborder(movy);
 
-	//Cursor color change collision
+	/********Color Collision test********/
+	/*Cursor color change collision
 	if (x > 150 && x < 300) {
 		red = 0;
 	}
@@ -116,32 +142,85 @@ void Game::UpdateModel()
 		blue = 0;
 	}
 	else blue = 255;
-
+	*/
 }
 
 void Game::ComposeFrame()
 {
+
+	DrawBox(x0, y0, 0,255,0);
+	DrawBox(x1, y1, 255, 255, 0);
+	DrawBox(x2, y2, 255, 255, 255);
+	if (colliding) {
+		DrawBox(movx, movy, 255,0,0);
+	}
+	else {
+		DrawBox(movx, movy, 255,255,255);
+	}
 	
-	gfx.PutPixel(x + 1, y, red, green, blue);
-	gfx.PutPixel(x + 2, y, red, green, blue);
-	gfx.PutPixel(x + 3, y, red, green, blue);
-	gfx.PutPixel(x + 4, y, red, green, blue);
-	gfx.PutPixel(x, y + 1, red, green, blue);
-	gfx.PutPixel(x, y + 2, red, green, blue);
-	gfx.PutPixel(x, y + 3, red, green, blue);
-	gfx.PutPixel(x, y + 4, red, green, blue);
-
-	gfx.PutPixel(x - 1, y, red, green, blue);
-	gfx.PutPixel(x - 2, y, red, green, blue);
-	gfx.PutPixel(x - 3, y, red, green, blue);
-	gfx.PutPixel(x - 4, y, red, green, blue);
-	gfx.PutPixel(x, y - 1, red, green, blue);
-	gfx.PutPixel(x, y - 2, red, green, blue);
-	gfx.PutPixel(x, y - 3, red, green, blue);
-	gfx.PutPixel(x, y - 4, red, green, blue);
-
-
-
-
 
 }
+
+void Game::DrawBox(int x, int y, int r, int g, int b) {
+
+	//Moving Reticle
+	gfx.PutPixel(x + 1, y, r, g, b);
+	gfx.PutPixel(x + 2, y, r, g, b);
+	gfx.PutPixel(x + 3, y, r, g, b);
+	gfx.PutPixel(x + 4, y, r, g, b);
+	gfx.PutPixel(x, y + 1, r, g, b);
+	gfx.PutPixel(x, y + 2, r, g, b);
+	gfx.PutPixel(x, y + 3, r, g, b);
+	gfx.PutPixel(x, y + 4, r, g, b);
+							  
+	gfx.PutPixel(x - 1, y, r, g, b);
+	gfx.PutPixel(x - 2, y, r, g, b);
+	gfx.PutPixel(x - 3, y, r, g, b);
+	gfx.PutPixel(x - 4, y, r, g, b);
+	gfx.PutPixel(x, y - 1, r, g, b);
+	gfx.PutPixel(x, y - 2, r, g, b);
+	gfx.PutPixel(x, y - 3, r, g, b);
+	gfx.PutPixel(x, y - 4, r, g, b);
+
+}
+
+bool Game::OverLapTest(int movx, int movy)
+{
+
+	return (movx <= x0 + 8 && movx >= x0 - 8 && movy >= y0 - 8 && movy <= y0 + 8) ||
+		   (movx <= x1 + 8 && movx >= x1 - 8 && movy >= y1 - 8 && movy <= y1 + 8) ||
+		   (movx <= x2 + 8 && movx >= x2 - 8 && movy >= y2 - 8 && movy <= y2 + 8);
+
+}
+
+int Game::xborder(int x)
+{
+
+	const int left = x - 4;
+	const int right = x + 4;
+
+	if(left < 0) {
+		return 5;
+	}
+	else if (right >= gfx.ScreenWidth) {
+		return gfx.ScreenWidth - 5;
+	}
+	else return x;
+
+}
+
+int Game::yborder(int y)
+{
+	const int top = y - 4;
+	const int bot = y + 4;
+
+	if (top < 0) {
+		return 5;
+	}
+	else if (bot >= gfx.ScreenHeight) {
+		return gfx.ScreenHeight - 5;
+	}
+	else return y;
+}
+
+
